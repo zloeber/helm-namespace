@@ -4,10 +4,13 @@ A generic helm3 namespace chart for use with helmfile or similar helm gluing too
 
 ## Values
 
+Pretty much just a list of namespaces to create as well as additional labels and annotations you'd like to append. You can also set if helm is allowed to delete the namespace or not. Default policy is 'keep'.
+
 ```
 namespaces:
 - namespace1
 - namespace2
+helmResourcePolicy: keep
 annotations:
   certmanager.k8s.io/disable-validation: true
 labels:
@@ -15,7 +18,7 @@ labels:
 ```
 ## Example - helmfile
 
-A simple example helmfile that creates a namespace as part of a cert-manager deployment. The default helm resource policy of 'keep' is used so that the namespace will not be removed in a helm destroy operation. Default tillerless plugin options are also set if this helmfile is created with helm version 2. I only include the namespace generation in this example for brevity.
+A simple example helmfile that creates a namespace as part of a cert-manager deployment. The default helm resource policy of 'keep' is used so that the namespace will not be removed in a helm destroy operation. This means you will have to manually delete the namespace if you want to reinstall the deployment while testing things out. Default tillerless plugin options are also set if this helmfile is created with helm version 2. I only include the namespace generation in this example for brevity.
 
 ```
 helmDefaults:
@@ -34,7 +37,7 @@ repositories:
 - name: "incubator"
   url: "https://kubernetes-charts-incubator.storage.googleapis.com"
 - name: "zloeber"
-  url: "git+https://github.com/zloeber/helm-namespace"
+  url: "git+https://github.com/zloeber/helm-namespace@chart"
 releases:
 ###############################################################################
 ## CERT-MANAGER - Automatic Let's Encrypt for Ingress  ########################
@@ -47,7 +50,7 @@ releases:
 - name: namespace-cert-manager
   # Helm 3 needs to put deployment info into a namespace. As this creates a namespace it will not exist yet so we use 'kube-system' 
   #  which should exist in all clusters.
-  chart: zloeber/helm-namespace
+  chart: zloeber/namespace
   namespace: kube-system
   labels:
     chart: namespace-cert-manager
@@ -163,3 +166,25 @@ releases:
                 route53: {}
 {{- end }}
 ```
+
+This helmfile will require that you use the helm-git plugin
+
+```
+helm plugin install https://github.com/aslafy-z/helm-git.git
+```
+
+### Alternative 1 - helm-namespace
+
+I've also done some testing with the helm-namespace plugin but this requires changing your helm commands and may interrupt existing workflows.
+
+```
+plugin install https://github.com/thomastaylor312/helm-namespace
+```
+
+### Alternative 2 - presync hooks
+
+There are also presync helm hooks which will allow you to run kubectl commands to create the namespace if it does not exist. This has the drawback of needing 100% certainty of your kubectl context.
+
+### Alternative 3 - raw charts
+
+The incubator/raw helm chart is a wonderous chart that you can do so many cool things with that of course you can also create your namespaces with it as well if desired. I just wanted a small point solution for use in all my existing helm charts so I opted to not use it this time around.
