@@ -34,7 +34,7 @@ repositories:
 - name: "incubator"
   url: "https://kubernetes-charts-incubator.storage.googleapis.com"
 - name: "zloeber"
-  url: "git+https://github.com/zloeber/helm-namespace@chart"
+  url: "git+https://github.com/zloeber/helm-namespace"
 releases:
 ###############################################################################
 ## CERT-MANAGER - Automatic Let's Encrypt for Ingress  ########################
@@ -47,7 +47,7 @@ releases:
 - name: namespace-cert-manager
   # Helm 3 needs to put deployment info into a namespace. As this creates a namespace it will not exist yet so we use 'kube-system' 
   #  which should exist in all clusters.
-  chart: "../charts/custom/namespace"
+  chart: zloeber/helm-namespace
   namespace: kube-system
   labels:
     chart: namespace-cert-manager
@@ -67,12 +67,12 @@ releases:
     namespace: "cert-manager"
     vendor: "jetstack"
     default: "false"
-  chart: "jetstack/cert-manager"
+  chart: jetstack/cert-manager
   version: "v0.9.0"
   wait: true
   installed: {{ env "CERT_MANAGER_INSTALLED" | default "true" }}
   hooks:
-    # This hoook adds the CRDs
+    # This hook adds the CRDs
     - events: ["presync"]
       showlogs: true
       command: "/bin/sh"
@@ -83,7 +83,6 @@ releases:
         create: {{ env "RBAC_ENABLED" | default "true" }}
       ingressShim:
         defaultIssuerName: '{{ env "CERT_MANAGER_INGRESS_SHIM_DEFAULT_ISSUER_NAME" | default "letsencrypt-staging" }}'
-        ### Optional: CERT_MANAGER_INGRESS_SHIM_DEFAULT_ISSUER_KIND;
         defaultIssuerKind: '{{ env "CERT_MANAGER_INGRESS_SHIM_DEFAULT_ISSUER_KIND" | default "ClusterIssuer" }}'
 {{ if env "CERT_MANAGER_IAM_ROLE" | default "" }}
       podAnnotations:
@@ -121,7 +120,6 @@ releases:
     component: "iam"
     namespace: "cert-manager"
     default: "true"
-  version: "0.1.0"
   wait: true
   force: true
   recreatePods: true
@@ -143,7 +141,6 @@ releases:
                 ingress:
                   class: nginx
 {{- if env "CERT_MANAGER_IAM_ROLE" | default "" }}
-            # Enable the DNS-01 challenge provider
             - dns01:
                 route53: {}
 {{- end }}
@@ -162,9 +159,7 @@ releases:
                 ingress:
                   class: nginx
 {{- if env "CERT_MANAGER_IAM_ROLE" | default "" }}
-            # Enable the DNS-01 challenge provider
             - dns01:
                 route53: {}
 {{- end }}
-
 ```
