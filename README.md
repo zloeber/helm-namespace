@@ -1,6 +1,6 @@
 # helm-namespace
 
-A generic helm3 namespace chart for use with helmfile or similar helm gluing toolsets. This is just a carry over solution for helm 3's inabilty to create namespaces for a release (likely going to change with helm 3.1). See [this thread](https://github.com/roboll/helmfile/issues/891) for more information and other options.
+A generic helm3 namespace chart for use with helmfile or similar helm gluing toolsets. This is just a carry over solution for helm 3's inabilty to create namespaces for a release (likely going to change with helm 3.1). 
 
 ## Values
 
@@ -173,9 +173,13 @@ This helmfile will require that you use the helm-git plugin
 helm plugin install https://github.com/aslafy-z/helm-git.git
 ```
 
+## Alternatives
+
+There are some alternatives which may be better suited to your particular need. See [this thread](https://github.com/roboll/helmfile/issues/891) for more information on each of these.
+
 ### Alternative 1 - helm-namespace
 
-I've also done some testing with the helm-namespace plugin but this requires changing your helm commands and may interrupt existing workflows.
+I've also done some testing with the helm-namespace plugin and it works very well. Unfortunately this requires changing your helm commands and may interrupt existing workflows. This is the first alternative and honestly, probably the best one.
 
 ```
 plugin install https://github.com/thomastaylor312/helm-namespace
@@ -183,8 +187,19 @@ plugin install https://github.com/thomastaylor312/helm-namespace
 
 ### Alternative 2 - presync hooks
 
-There are also presync helm hooks which will allow you to run kubectl commands to create the namespace if it does not exist. This has the drawback of needing 100% certainty of your kubectl context.
+There are also presync helm hooks which will allow you to run kubectl commands to create the namespace if it does not exist. A helmfile would have a presync hook like the following to accomplish this task.
+```
+- events: ["presync"]
+      showlogs: true
+      command: "/bin/sh"
+      args:
+      - "-c"
+      - >-
+        kubectl get namespace "{{`{{ .Release.Namespace }}`}}" >/dev/null 2>&1 || kubectl create namespace "{{`{{ .Release.Namespace }}`}}";
+```
+
+This has the drawback of requiring 100% certainty of your kubectl context and version. It also obscures your end helm state (imho). Benefits for using this would be that your helm deployment will not puke out on you if the resource (namespace) already exists.
 
 ### Alternative 3 - raw charts
 
-The incubator/raw helm chart is a wonderous chart that you can do so many cool things with that of course you can also create your namespaces with it as well if desired. I just wanted a small point solution for use in all my existing helm charts so I opted to not use it this time around.
+The incubator/raw helm chart is a wonderous chart that you can do so many cool things with that of course you can also create your namespaces with it if desired. Drawback is that it is pure kubernetes declarative manifest yaml (for the most part). Plus, I just wanted a small point solution for use in all my existing helm charts so I opted to not use the raw chart for this particular need.
