@@ -1,6 +1,6 @@
 # helm-namespace
 
-A generic helm3 namespace chart for use with helmfile or similar helm gluing toolsets. This is just a carry over solution for helm 3's inabilty to create namespaces for a release (likely going to change with helm 3.1). See (this thread)[https://github.com/roboll/helmfile/issues/891.] for more information and other options.
+A generic helm3 namespace chart for use with helmfile or similar helm gluing toolsets. This is just a carry over solution for helm 3's inabilty to create namespaces for a release (likely going to change with helm 3.1). See [this thread](https://github.com/roboll/helmfile/issues/891) for more information and other options.
 
 ## Values
 
