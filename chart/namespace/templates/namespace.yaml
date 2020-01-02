@@ -14,7 +14,7 @@ metadata:
 {{- end }}
 {{- with $annotations }}
   annotations:
-    helm.sh/resource-policy: {{ $helmResourcePolicy }}
+    helm.sh/resource-policy: "{{ $helmResourcePolicy }}"
 {{ toYaml . | indent 4 }}
 {{- end }}
     
