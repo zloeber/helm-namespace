@@ -1,4 +1,4 @@
-apiVersion: v1
+apiVersion: v2
 name: namespace
 description: A generic helm3 namespace chart
 type: application
