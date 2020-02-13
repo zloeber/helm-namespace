@@ -1,7 +1,7 @@
 {{- $annotations := .Values.annotations -}}
 {{- $labels := .Values.labels -}}
 {{- $helmResourcePolicy := .Values.helmResourcePolicy -}}
-{{- range $key := .Values.namespaces -}}
+{{- range $key := .Values.namespaces}}
 ---
 apiVersion: v1
 kind: Namespace
